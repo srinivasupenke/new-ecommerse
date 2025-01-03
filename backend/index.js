@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://shoppy-ecommerce-frontend.onrender.com",
+      "https://shoppy-ecommerce-website-frontend.onrender.com",
     ],
   })
 );
