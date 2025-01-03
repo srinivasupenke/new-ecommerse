@@ -47,6 +47,14 @@
   border: none;
   padding: 15px 5px;
 }
+
+.hero-latest-button:hover {
+  background-color: #e03e3e;
+}
+
+.hero-latest-button:active {
+  transform: scale(0.98);
+}
 .hero-section-right {
   display: flex;
   flex: 1;

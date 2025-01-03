@@ -10,6 +10,7 @@ import Footer from "./Components/Footer/Footer";
 import men_banner from "./Components/Assets/banner_mens.png";
 import women_banner from "./Components/Assets/banner_women.png";
 import kids_banner from "./Components/Assets/banner_kids.png";
+import NewCollection from "./Components/NewCollection/NewCollection";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         </Route>
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<LoginSignUp />} />
+        <Route path="/new-collection" element={<NewCollection />} />
       </Routes>
       <Footer />
     </BrowserRouter>

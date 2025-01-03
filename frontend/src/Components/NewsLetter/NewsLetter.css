@@ -133,7 +133,6 @@
 @media (max-width: 500px) {
   .news-letter {
     height: 35vh;
-    width: 90%;
     padding-top: 10px;
     gap: 15px;
   }
