@@ -15,7 +15,7 @@ const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [loading, setLoading] = useState(false); // Loader state
 
-  const url = "https://shoppy-ecommerce-backend.onrender.com";
+  const url = "https://shoppy-ecommerce-website-backend.onrender.com";
 
   useEffect(() => {
     setLoading(true); // Start loader
