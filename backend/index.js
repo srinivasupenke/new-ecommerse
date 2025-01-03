@@ -221,7 +221,7 @@ app.post("/login", async (req, res) => {
 
 app.get("/newcollections", async (req, res) => {
   let products = await Product.find({});
-  let newcollection = products.slice(1).slice(-8);
+  let newcollection = products.slice(0).slice(-8);
   console.log("NEW COLLECTION FETCHED");
   res.send(newcollection);
 });
