@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      "https://shoppy-ecommerce-website-frontend.onrender.com",
       "https://shoppy-ecommerce-website-admin.onrender.com",
+      "https://shoppy-ecommerce-website-frontend.onrender.com",
     ],
   })
 );
