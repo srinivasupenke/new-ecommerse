@@ -16,8 +16,6 @@ app.use(
     origin: [
       "https://shoppy-ecommerce-website-frontend.onrender.com",
       "https://shoppy-ecommerce-website-admin.onrender.com",
-      f,
-      git,
     ],
   })
 );
