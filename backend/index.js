@@ -17,6 +17,7 @@ app.use(
       "https://shoppy-ecommerce-website-admin.onrender.com",
       "https://shoppy-ecommerce-website-frontend.onrender.com",
     ],
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   })
 );
 
