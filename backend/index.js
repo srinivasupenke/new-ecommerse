@@ -11,11 +11,6 @@ const port = process.env.PORT || 4000;
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log("Origin: ", req.headers.origin); // Log the origin of the request
-  next(); // Continue with the request processing
-});
-
 app.use(
   cors({
     origin: [
