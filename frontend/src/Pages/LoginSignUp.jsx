@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./CSS/LoginSignUp.css";
 
 const LoginSignUp = () => {
-  const url = "https://shoppy-ecommerce-website-backend.onrender.com";
+  const url = "http://localhost:4000";
 
   const [state, setState] = useState("Login");
   const [formData, setFormData] = useState({
