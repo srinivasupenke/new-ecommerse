@@ -281,7 +281,7 @@ app.post("/removefromcart", fetchUser, async (req, res) => {
 
 //Crating endpoint to get cartdata
 
-app.post("/getcart", fetchUser, async (req, res) => {
+app.get("/getcart", fetchUser, async (req, res) => {
   console.log("GetCart");
   let userData = await Users.findOne({ _id: req.user.id });
 
