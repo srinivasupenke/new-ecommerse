@@ -17,7 +17,7 @@ app.use(
       "https://shoppy-ecommerce-website-admin.onrender.com",
       "https://shoppy-ecommerce-website-frontend.onrender.com",
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
@@ -285,6 +285,11 @@ app.post("/removefromcart", fetchUser, async (req, res) => {
 app.post("/getcart", fetchUser, async (req, res) => {
   console.log("GetCart");
   let userData = await Users.findOne({ _id: req.user.id });
+
+  if (!userData) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
   res.json(userData.cartData);
 });
 
