@@ -5,7 +5,7 @@ import cross_icon from "../../assets/cross_icon.png";
 const ListProduct = () => {
   const [allproducts, setAllProducts] = useState([]);
 
-  const url = "http://localhost:4000";
+  const url = "https://shoppy-ecommerce-website-backend.onrender.com";
 
   const fetchInfo = async () => {
     await fetch(`${url}/allproducts`)
