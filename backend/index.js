@@ -1,30 +1,30 @@
+require("dotenv").config();
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const { type } = require("os");
+const bcrypt = require("bcrypt");
 
+const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: [
-      "https://shoppy-ecommerce-website-admin.onrender.com",
-      "https://shoppy-ecommerce-website-frontend.onrender.com",
-    ],
-  })
-);
+app.use(cors());
+
+const JWT_SECRET = process.env.JWT_SECRET || "secret_ecom";
 
 //Databse Connection with MongoDB
-
-mongoose.connect(
-  "mongodb+srv://srinivas14:srinivas1422@cluster0.lgfgi.mongodb.net/e-commerce"
-);
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 //API Creation
 
@@ -44,7 +44,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 //Creating Upload Endpoint for image
 
@@ -53,7 +53,7 @@ app.use("/images", express.static(path.join(__dirname, "./upload/images")));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `https://shoppy-ecommerce-website-backend.onrender.com/images/${req.file.filename}`,
+    image_url: `http://localhost:${port}/images/${req.file.filename}`,
   });
 });
 
@@ -177,21 +177,30 @@ app.post("/signup", async (req, res) => {
   for (let i = 0; i < 300; i++) {
     cart[i] = 0;
   }
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+
   const user = new Users({
     name: req.body.name,
     email: req.body.email,
-    password: req.body.password,
+    password: hashedPassword,
     cartData: cart,
   });
-  await user.save();
-  const data = {
-    user: { id: user.id },
-  };
-  const token = jwt.sign(data, "secret_ecom");
-  res.json({
-    success: true,
-    token,
-  });
+
+  try {
+    await user.save();
+    const data = {
+      user: { id: user.id },
+    };
+    const token = jwt.sign(data, process.env.JWT_SECRET);
+    res.json({
+      success: true,
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error saving user", details: err.message });
+  }
 });
 
 // Creating EndPonit for User Login
@@ -199,22 +208,26 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   let user = await Users.findOne({ email: req.body.email });
 
-  if (user) {
-    const passcompare = req.body.password === user.password;
-    if (passcompare) {
-      const data = {
-        user: {
-          id: user.id,
-        },
-      };
-      const token = jwt.sign(data, "secret_ecom");
-      res.json({ success: true, token });
-    } else {
-      res.json({ success: false, errors: "Wrong password" });
-    }
-  } else {
-    res.json({ success: false, errors: "Wrong Email ID" });
+  if (!user) {
+    return res.status(400).json({ success: false, errors: "Wrong Email ID" });
   }
+
+  const isPasswordValid = await bcrypt.compare(
+    req.body.password,
+    user.password
+  );
+  if (!isPasswordValid) {
+    return res.status(400).json({ success: false, errors: "Wrong Password" });
+  }
+
+  const data = {
+    user: {
+      id: user.id,
+    },
+  };
+
+  const token = jwt.sign(data, process.env.JWT_SECRET);
+  res.json({ success: true, token });
 });
 
 //Creating endPoint for newcollection data
@@ -244,7 +257,7 @@ const fetchUser = async (req, res, next) => {
     res.status(401).send({ error: "Please authoticate using valid user " });
   } else {
     try {
-      const data = jwt.verify(token, "secret_ecom");
+      const data = jwt.verify(token, process.env.JWT_SECRET);
       req.user = data.user;
       next();
     } catch (error) {
@@ -256,13 +269,21 @@ const fetchUser = async (req, res, next) => {
 //Creating endPoint for adding products to cartdata
 
 app.post("/addtocart", fetchUser, async (req, res) => {
-  let userData = await Users.findOne({ _id: req.user.id });
-  userData.cartData[req.body.itemId] += 1;
-  await Users.findOneAndUpdate(
-    { _id: req.user.id },
-    { cartData: userData.cartData }
-  );
-  res.json({ message: "Added" });
+  try {
+    let userData = await Users.findOne({ _id: req.user.id });
+    if (!userData) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const itemId = req.body.itemId;
+    userData.cartData[itemId] = (userData.cartData[itemId] || 0) + 1;
+
+    await Users.findByIdAndUpdate(req.user.id, { cartData: userData.cartData });
+    res.json({ message: "Added to cart" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to add to cart" });
+  }
 });
 
 // creating endpoint for removing products to cartdata
@@ -294,7 +315,7 @@ app.post("/getcart", fetchUser, async (req, res) => {
 
 app.listen(port, (error) => {
   if (!error) {
-    console.log("Server Running Succesfully " + port);
+    console.log(`Server Running Succesfully ${port}`);
   } else {
     console.log("Error " + error);
   }
