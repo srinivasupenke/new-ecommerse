@@ -6,7 +6,6 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const { type } = require("os");
-const bcrypt = require("bcrypt");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -178,13 +177,13 @@ app.post("/signup", async (req, res) => {
     cart[i] = 0;
   }
 
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+  // const saltRounds = 10;
+  // const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
   const user = new Users({
     name: req.body.name,
     email: req.body.email,
-    password: hashedPassword,
+    password: req.body.password,
     cartData: cart,
   });
 
@@ -212,11 +211,12 @@ app.post("/login", async (req, res) => {
     return res.status(400).json({ success: false, errors: "Wrong Email ID" });
   }
 
-  const isPasswordValid = await bcrypt.compare(
-    req.body.password,
-    user.password
-  );
-  if (!isPasswordValid) {
+  // const isPasswordValid = await bcrypt.compare(
+  //   req.body.password,
+  //   user.password
+  // );
+
+  if (!password) {
     return res.status(400).json({ success: false, errors: "Wrong Password" });
   }
 
