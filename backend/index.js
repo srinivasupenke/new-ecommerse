@@ -10,11 +10,24 @@ const { type } = require("os");
 const app = express();
 const port = process.env.PORT || 4000;
 
-app.use(express.json());
-
-app.use(cors());
-
 const JWT_SECRET = process.env.JWT_SECRET || "secret_ecom";
+
+//  Enable CORS with specific frontend URLs
+app.use(
+  cors({
+    origin: [
+      "https://shoppy-ecommerce-website-frontend.onrender.com",
+      "https://shoppy-ecommerce-website-admin.onrender.com",
+      "http://localhost:3000",
+    ],
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+  })
+);
+
+//  Allow JSON requests
+app.use(express.json());
 
 //Databse Connection with MongoDB
 mongoose
@@ -52,7 +65,10 @@ app.use("/images", express.static(path.join(__dirname, "./upload/images")));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `http://localhost:${port}/images/${req.file.filename}`,
+    // image_url: `http://localhost:${port}/images/${req.file.filename}`,
+    image_url: `${req.protocol}://${req.get("host")}/images/${
+      req.file.filename
+    }`,
   });
 });
 
@@ -313,10 +329,6 @@ app.post("/getcart", fetchUser, async (req, res) => {
   res.json(userData.cartData);
 });
 
-app.listen(port, (error) => {
-  if (!error) {
-    console.log(`Server Running Succesfully${port}`);
-  } else {
-    console.log("Error " + error);
-  }
+app.listen(port, () => {
+  console.log(`Server Running Successfully on Port ${port}`);
 });
