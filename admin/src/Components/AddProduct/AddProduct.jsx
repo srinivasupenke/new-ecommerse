@@ -3,7 +3,7 @@ import "./AddProduct.css";
 import upload_area from "../../assets/upload_area.svg";
 
 const AddProduct = () => {
-  const url = "http://localhost:4000";
+  const url = "https://shoppy-ecommerce-website-backend.onrender.com";
 
   const [image, setImgae] = useState(false);
 
