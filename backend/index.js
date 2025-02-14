@@ -5,7 +5,9 @@ import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/userRoute.js";
 import productRouter from "./routes/productRoute.js";
+import productModel from "./models/productModel.js";
 
+// App Config
 const app = express();
 const port = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "secret_ecom";
@@ -13,8 +15,11 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret_ecom";
 connectDB();
 connectCloudinary();
 
-app.use(cors());
+//middleware
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
@@ -25,36 +30,11 @@ app.get("/", (req, res) => {
   res.send("App is Runnings");
 });
 
-//Creating API For deleting Product
-
-app.post("/removeproduct", async (req, res) => {
-  await Product.findOneAndDelete({ id: req.body.id });
-  console.log("Removed");
-  res.json({
-    success: true,
-    name: req.body.name,
-  });
-});
-
-//Creating API Getting All Products
-
-app.get("/allproducts", async (req, res) => {
-  let products = await Product.find({});
-  console.log("All Products Fteched");
-  res.send(products);
-});
-
-//Careating EndPoint for registering User
-
-// const saltRounds = 10;
-// const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-
-// Creating EndPonit for User Login
-
 //Creating endPoint for newcollection data
 
 app.get("/newcollections", async (req, res) => {
-  let products = await Product.find({});
+  let products = await productModel.find({});
+  console.log(products);
   let newcollection = products.slice(0).slice(-8);
   console.log("NEW COLLECTION FETCHED");
   res.send(newcollection);
@@ -63,7 +43,7 @@ app.get("/newcollections", async (req, res) => {
 //Creating endPoint for popularinwomen data
 
 app.get("/popularinwomen", async (req, res) => {
-  let products = await Product.find({ category: "women" });
+  let products = await productModel.find({ category: "women" });
   let popular_in_women = products.slice(0, 4);
   console.log("Poppular in women products fetched");
   res.send(popular_in_women);

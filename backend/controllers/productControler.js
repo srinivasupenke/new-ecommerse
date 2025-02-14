@@ -41,7 +41,52 @@ const addProduct = async (req, res) => {
   }
 };
 
-const removeProduct = async (req, res) => {};
-const listProduct = async (req, res) => {};
+// function for list all products
+const listProduct = async (req, res) => {
+  try {
+    const products = await productModel.find({});
+    console.log(products);
 
-export { addProduct };
+    res.json({ success: true, products });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// function for remove product
+const removeProduct = async (req, res) => {
+  try {
+    const { id } = req.body;
+    console.log(req.body);
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Product ID required" });
+    }
+
+    await productModel.findByIdAndDelete(req.body.id);
+    console.log(req.body);
+    console.log(req.body.id);
+    res.json({ success: true, message: "Product removed" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// function for single product info
+const singleProduct = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    console.log(productId);
+    const product = await productModel.findById(productId);
+
+    res.json({ success: true, product });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { addProduct, listProduct, removeProduct, singleProduct };
